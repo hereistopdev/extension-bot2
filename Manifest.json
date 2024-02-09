@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "DH extension",
+  "version": "1.0",
+  "permissions": ["tabs", "storage", "activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["https://steamcommunity.com/profiles/*"],
+      "js": ["tradeCancel.js"]
+    }
+  ],
+
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "1.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
