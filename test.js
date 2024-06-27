@@ -1,74 +1,76 @@
-function init() {
-  var steamTradeOffersURL =
-    "https://steamcommunity.com/profiles/76561198156144508/tradeoffers/sent/";
+function getElementsByClass(className) {
+  return document.getElementsByClassName(className);
+}
 
+function clickElement(element) {
+  if (element) {
+    element.click();
+    console.log(`Clicked element with class: ${element.innerText}`);
+  }
+}
+
+function collectItemCards() {
+  let items = getElementsByClass("item-card selectable");
+  let itemArray = [];
+
+  for (let item of items) {
+    const priceElement = item.querySelector(".currency-value");
+    const priceValue = priceElement ? priceElement.textContent : "Unknown";
+    let FN = item.querySelector(".wear");
+    FN = FN ? FN.innerText : null;
+    itemArray.push({ element: item, price: priceValue, FN });
+  }
+
+  return itemArray;
+}
+
+function sortItemsByPrice(itemArray) {
+  itemArray.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+}
+function performBotActions() {
   console.log("Bot Starts working");
-  let items = document.getElementsByClassName("item-card selectable");
-  let btnDeposit = document.getElementsByClassName(
+  let items = collectItemCards();
+  sortItemsByPrice(items);
+
+  let randomIndex = Math.floor(Math.random() * items.length);
+  if (items[randomIndex]) items[randomIndex].element.click();
+
+  let btnDeposit = getElementsByClass(
     "mat-focus-indicator w-100 mat-button-3d mat-button-lg mat-flat-button mat-button-base mat-accent"
   );
 
-  let arr = [];
-
-  for (let i = 0; i < items.length; i++) {
-    const itemCard = items[i];
-    const priceElement = itemCard.querySelector(".currency-value");
-    const priceValue = priceElement ? priceElement.textContent : "Unknown"; // Get the text content if price element exists
-    let FN = itemCard.querySelector(".wear");
-    if (FN) FN = FN.innerText;
-    arr.push({ val: itemCard, price: priceValue, FN }); // Push an object with the item card and the price value onto the array
-  }
-  //mat-focus-indicator w-100 mat-flat-button mat-button-base mat-primary
-  let sum = 0;
-  while (sum < 10) {
-    if (arr.length == 0) {
-      const temp = document.getElementsByClassName(
-        "mat-focus-indicator mat-button-3d d-block mt-4 mx-auto mat-flat-button mat-button-base mat-accent ng-star-inserted"
-      );
-      if (temp.length) temp[0].click();
-    }
-    sum++;
-  }
-
-  arr.sort((a, b) => a.price - b.price);
-
-  let RandNum = 0;
-  RandNum = Math.trunc(Math.random() * arr.length);
-  //Bot action as person
-  if (arr.length > RandNum) arr[RandNum].val.click();
   setTimeout(() => {
-    const temp = document.getElementsByClassName(
+    let applyButton = getElementsByClass(
       "mat-focus-indicator w-100 mat-flat-button mat-button-base mat-primary"
-    );
-    if (temp.length) temp[0].click();
+    )[0];
+    clickElement(applyButton);
+
     setTimeout(() => {
-      if (btnDeposit.length) btnDeposit[0].click();
+      clickElement(btnDeposit[0]);
+
       setTimeout(() => {
-        let okBtn = document.getElementsByClassName(
+        let okButton = getElementsByClass(
           "mat-focus-indicator w-100 mb-2 mat-button-3d mat-button-lg mat-flat-button mat-button-base mat-accent"
-        );
-        if (okBtn.length) {
-          okBtn[0].click();
-          console.log("OK Clicked");
-        }
+        )[0];
+        clickElement(okButton);
 
         setTimeout(() => {
-          let readyBtn = document.getElementsByClassName(
+          let readyButton = getElementsByClass(
             "mat-focus-indicator w-100 mb-3 mat-button-3d mat-button-lg mat-flat-button mat-button-base mat-accent ng-star-inserted"
-          );
-          if (readyBtn.length) readyBtn[0].click();
+          )[0];
+          clickElement(readyButton);
 
           setTimeout(() => {
-            let continueBtn = document.getElementsByClassName(
+            let continueButton = getElementsByClass(
               "mat-focus-indicator w-100 mat-button-3d mat-button-lg mb-3 mat-flat-button mat-button-base mat-accent ng-star-inserted"
-            );
-            if (continueBtn.length) continueBtn[0].click();
+            )[0];
+            clickElement(continueButton);
+
             setTimeout(() => {
-              let confirmBtn = document.getElementsByClassName(
+              let confirmButton = getElementsByClass(
                 "mat-focus-indicator w-50 mat-button-3d mat-button-lg mat-flat-button mat-button-base mat-accent"
-              );
-              console.log("conFirmBut", confirmBtn, confirmBtn.length);
-              if (confirmBtn.length) {
+              )[0];
+              if (confirmButton) {
                 const Imgdiv = document.getElementsByClassName(
                   "item selected ng-star-inserted"
                 );
@@ -79,7 +81,6 @@ function init() {
                 let _id = 0;
                 imgItems = document.querySelectorAll(".item");
                 Array.from(imgItems).map((v, i) => {
-                  console.log(v, i);
                   if (v.className == "item selected ng-star-inserted") {
                     _id = i;
                   }
@@ -91,81 +92,96 @@ function init() {
                 );
                 if (tempText.length) {
                   const arr = tempText[0].innerText.split(" ");
-                  console.log(arr);
                   if (arr.length > 2) _page = Number(arr[2]);
                 }
                 FinalID = (_page - 1) * 16 + _id;
-                console.log(
-                  _id,
-                  _page,
-                  FinalID,
-                  "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-                );
 
                 chrome.storage.local.set({ key: pic.src, fn: FinalID });
+                console.log(FinalID, chrome.storage.local.get());
 
-                console.log("Clicked", confirmBtn[0], pic.src);
                 setTimeout(() => {
-                  confirmBtn[0].click(); //Final
+                  clickElement(confirmButton);
 
                   setTimeout(() => {
-                    const v = document.querySelector(
-                      ".cdk-overlay-backdrop-showing"
-                    );
-
-                    if (v) {
-                      v.click();
-                      v.click();
-                      v.click();
-                      console.log("Backed!");
-                      // init();
-                    }
-                  }, 1000);
-                  setTimeout(() => {
-                    console.log("hey", FinalID);
-                    // window.open(steamTradeOffersURL, "_blank");
-                    // window.close();
-
-                    const v = document.getElementsByClassName(
+                    let primaryButton = getElementsByClass(
                       "mat-focus-indicator mat-button mat-button-base mat-primary"
                     );
-                    if (v.length) v[v.length - 1].click();
+                    if (primaryButton.length)
+                      clickElement(primaryButton[primaryButton.length - 1]);
+
                     setTimeout(() => {
-                      vv = document.querySelector(".mat-checkbox-layout");
-                      if (vv) vv.click();
+                      let checkBox = document.querySelector(
+                        ".mat-checkbox-layout"
+                      );
+                      clickElement(checkBox);
+
                       setTimeout(() => {
-                        vvv = document.getElementsByClassName(
+                        let warnButton = getElementsByClass(
                           "mat-focus-indicator w-100 mat-button-3d mat-button-lg mat-flat-button mat-button-base mat-warn"
-                        );
-                        if (vvv.length) vvv[0].click();
+                        )[0];
+                        clickElement(warnButton);
                       }, 1000);
-                    });
-                  }, 10 * 60 * 1000); //Time to cancel
+                    }, 0);
+                  }, 12 * 60 * 1000); // Time to cancel
                 }, 5000);
               }
-            }, 5000);
+            }, 15000);
           }, 3000);
         }, 10000);
-      }, 60 * 1000);
+      }, 10000);
     }, 1000);
   }, 1000);
 }
 
-setTimeout(() => {
+function checkStartCondition() {
   chrome.storage.local.get(["start"], function (result) {
-    console.log(result);
     if (result.start) {
-      init();
+      performBotActions();
+
+      const intervalId = setInterval(() => {
+        console.log("Interval Start");
+        const warningElements = getElementsByClass(
+          "mat-checkbox-inner-container"
+        );
+        if (warningElements && warningElements.length > 1) {
+          clickElement(warningElements[1]);
+
+          const closeButton =
+            warningElements[1]?.parentElement?.parentElement?.parentElement
+              ?.nextElementSibling?.children[0];
+          clickElement(closeButton);
+          console.log("Close Button Clicked!");
+        }
+
+        const TradeNotFound = document.getElementsByClassName(
+          "mat-dialog-container cdk-dialog-container ng-tns-c2096979241-16 ng-trigger ng-trigger-dialogContainer ng-star-inserted"
+        );
+        if (TradeNotFound.length) {
+          if (
+            TradeNotFound[0]?.children[0]?.children[0]?.textContent ==
+            "Trade Not Confirmed"
+          ) {
+            console.log("Trade Not Confirmed Click");
+            TradeNotFound[0]?.children[0]?.children[1].lastChild.click();
+          }
+        }
+
+        const success_btn = document.getElementsByClassName(
+          "mat-focus-indicator w-100 mat-button-3d mat-button-lg mat-flat-button mat-button-base mat-accent"
+        );
+        if (success_btn.length && success_btn[0].innerText == "OK") {
+          console.log("Trade Complete Success Button", success_btn);
+          success_btn[0].click();
+        }
+      }, 1000);
       setTimeout(() => {
+        clearInterval(intervalId);
         location.reload();
-      }, 13 * 60 * 1000);
+      }, 5 * 60 * 1000);
+    } else {
+      console.log("Bot should stop working!!!");
     }
   });
-}, 5000);
+}
 
-// if (!window.intervalId) {
-//   // window.intervalId = setInterval(() => {
-//   console.log("Hi"); // This will be logged in the context of the current page.
-//   init();
-//   // }, 60 * 1000);
-// }
+setTimeout(checkStartCondition, 5000);

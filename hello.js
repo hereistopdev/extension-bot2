@@ -10,6 +10,7 @@ setTimeout(() => {
   }
 
   chrome.storage.local.get(["key", "fn"], function (result) {
+    console.log(result);
     let temp = document.querySelectorAll(".itemHolder");
     triggerDoubleClick(temp[result.fn].firstChild);
 
@@ -30,9 +31,13 @@ setTimeout(() => {
 
           console.log(v);
           if (v.length) {
+            console.log("press Button");
             v[0].click();
           }
-        }, 2000);
+          setTimeout(() => {
+            window.close();
+          }, 5000);
+        }, 5000);
       }, 1000);
     }, 1000);
     // }
